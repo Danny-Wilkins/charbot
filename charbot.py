@@ -238,4 +238,4 @@ async def standard(*args):
     await bot.say(embed=results)
 
 
-bot.run("NDU0ODY1Mzg4NjczNDMzNjIw.Dl3jbA.hGseyrqTUvpgC4Ydud_Dko1l-tU")
+bot.run("[TOKEN_HERE")
