@@ -19,7 +19,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 
 @bot.event
 async def on_ready():
-    print('Logged in as ' + bot.user.name + ' (ID:' + bot.user.id + ') | Connected to ' + str(len(bot.servers))+' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
+    print('Logged in as ' + str(bot.user.name) + ' (ID:' + str(bot.user.id) + ') | Connected to ' + str(len(bot.servers))+' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
     print('--------')
     print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
     print('--------')
