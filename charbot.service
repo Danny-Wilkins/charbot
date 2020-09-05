@@ -1,0 +1,17 @@
+[Unit]
+Description=Charbot
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/ubuntu/charbot/charbot.py %> /dev/null
+Type=simple
+User=<user>
+Group=<group>
+Environment="DISCORD_TOKEN=<token>"
+WorkingDirectory=/home/ubuntu/charbot
+Restart=always
+RestartSec=15
+RestartPreventExitStatus=0
+
+[Install]
+WantedBy=multi-user.target
