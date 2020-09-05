@@ -19,7 +19,7 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 
 @bot.event
 async def on_ready():
-    print('Logged in as ' + str(bot.user.name) + ' (ID:' + str(bot.user.id) + ') | Connected to ' + str(len(bot.servers))+' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
+    print('Logged in as ' + str(bot.user.name) + ' (ID:' + str(bot.user.id) + ') | Connected to ' + str(len(bot.guilds))+' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
     print('--------')
     print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
     print('--------')
@@ -33,13 +33,13 @@ async def ping(ctx):
     await bot       (":ping_pong: ping!!")
 '''
 
-@bot.command(pass_context = False)
-async def hybrid(*args):
+@bot.command()
+async def hybrid(bot_, *args):
     global contingency_points
     global hardcore
 
     if len(args) != 7:
-        await bot.send("Invalid command! Usage: ~hybrid [hard|soft]core \_ \_ \_ \_ \_ \_ (each _ is a formula letter [a|b|c|d])")
+        await bot_.send("Invalid command! Usage: ~hybrid [hard|soft]core \_ \_ \_ \_ \_ \_ (each _ is a formula letter [a|b|c|d])")
         return
 
     hardcore = args[0]
@@ -81,15 +81,15 @@ async def hybrid(*args):
 
     results = await generateResults(stats)
 
-    await bot.send(embed=results)
+    await bot_.send(embed=results)
     
     
-    await bot.send("{} contingency points remaining.".format(contingency_points))
+    await bot_.send("{} contingency points remaining.".format(contingency_points))
     
     if contingency_points != 0:
-        await bot.send("To spend contingency points, use command \"~contingency # # # # # #\"")
+        await bot_.send("To spend contingency points, use command \"~contingency # # # # # #\"")
 
-async def roll(formula):
+async def roll(bot_, formula):
     global contingency_points
     if formula == 'A' and contingency_points >= 3:
         contingency_points -= 3
@@ -105,7 +105,7 @@ async def roll(formula):
     else:
         return None
 
-async def generateResults(stats):
+async def generateResults(bot_, stats):
     global hardcore
     results = "\n======RESULTS======\n"
 
@@ -122,7 +122,7 @@ async def generateResults(stats):
 
     return embed
 
-async def valid(contingency_points, formulas):
+async def valid(bot_, contingency_points, formulas):
     for formula in formulas:
 
         if formula.upper() == 'A':
@@ -134,24 +134,24 @@ async def valid(contingency_points, formulas):
         elif formula.upper() == 'D':
             contingency_points -= 0
         else:
-            await bot.send("Invalid formula entry!")
+            await bot_.send("Invalid formula entry!")
             return False
 
     if contingency_points >= 0:
         return True
     else:
-        await bot.send("Not enough contingency points!")
+        await bot_.send("Not enough contingency points!")
         return False
 
-@bot.command(pass_context = False)
-async def contingency(*args):
+@bot.command()
+async def contingency(bot_, *args):
     global contingency_points
     global hardcore
 
     contingency_spend = list(map(int, args))
 
     if sum(contingency_spend) > contingency_points:
-        await bot.send("Not enough contingency points!")
+        await bot_.send("Not enough contingency points!")
         return
 
     if hardcore:
@@ -166,7 +166,7 @@ async def contingency(*args):
                 elif 15 <= stats[stat] < 18:
                     stats[stat] += 1
                 else:
-                    await bot.send("No effect. Choose another stat.")
+                    await bot_.send("No effect. Choose another stat.")
                     contingency_points += 1
 
                 spend -= 1
@@ -182,23 +182,23 @@ async def contingency(*args):
                 elif 15 <= stats[i] < 18:
                     stats[i] += 1
                 else:
-                    await bot.send("No effect. Choose another stat.")
+                    await bot_.send("No effect. Choose another stat.")
                     contingency_points += 1
 
                 contingency_spend[i] -= 1
                 contingency_points -= 1    
 
     results = await generateResults(stats)
-    await bot.send(embed=results)
-    await bot.send("To add racial bonuses, use command \"~race # # # # # #\"")
+    await bot_.send(embed=results)
+    await bot_.send("To add racial bonuses, use command \"~race # # # # # #\"")
 
     if hardcore:
         json.dump(stats, open("character.json", "w"), indent=4)
     else:
         pickle.dump(stats, open("character.txt", "wb"))
 
-@bot.command(pass_context = False)
-async def race(*args):
+@bot.command()
+async def race(bot_, *args):
     global hardcore
     
     if hardcore:
@@ -211,15 +211,15 @@ async def race(*args):
             stats[i] += int(args[i])
 
     results = await generateResults(stats)
-    await bot.send(embed=results)
+    await bot_.send(embed=results)
 
     if hardcore:
         json.dump(stats, open("character.json", "w"), indent=4)
     else:
         pickle.dump(stats, open("character.txt", "wb"))
 
-@bot.command(pass_context=False)
-async def standard(*args):
+@bot.command()
+async def standard(bot_, *args):
     global hardcore
     hardcore = True
 
@@ -231,13 +231,13 @@ async def standard(*args):
         for i in range(0, 4):
             rolls.append(randint(1,6))
 
-        await bot.send(stat + ": " + str(rolls) + " drop " + str(min(rolls)))
+        await bot_.send(stat + ": " + str(rolls) + " drop " + str(min(rolls)))
         
         rolls.remove(min(rolls))
         stats[stat] = sum(rolls)
 
     results = await generateResults(stats)
-    await bot.send(embed=results)
+    await bot_.send(embed=results)
 
 
 bot.run(TOKEN)
