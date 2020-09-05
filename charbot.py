@@ -48,23 +48,23 @@ async def hybrid(bot_, *args):
     if hardcore[0].lower() == "h":
         contingency_points = 7
         #If too many contingency points are used, quit function
-        if not await valid(contingency_points, formulas):
+        if not await valid(bot_, contingency_points, formulas):
             return
         hardcore = True
         stats = OrderedDict({'Strength':0, 'Dexterity':0, 'Constitution':0, 'Intelligence':0,
             'Wisdom':0, 'Charisma':0})
         for stat, formula in zip(stats, formulas):
-            stats[stat] = await roll(formula.upper())
+            stats[stat] = await roll(bot_, formula.upper())
         json.dump(stats, open("character.json", "w"), indent=4)
     else:
         contingency_points = 6
         #If too many contingency points are used, quit function
-        if not await valid(contingency_points, formulas):
+        if not await valid(bot_, contingency_points, formulas):
             return
         hardcore = False
         stats = [0, 0, 0, 0, 0, 0]
         for i in range(0, 6):
-            stats[i] = await roll(formulas[i].upper())
+            stats[i] = await roll(bot_, formulas[i].upper())
         pickle.dump(stats, open("character.txt", "wb"))
         
 
@@ -79,7 +79,7 @@ async def hybrid(bot_, *args):
     print("0 points: D - 3d6")
     '''
 
-    results = await generateResults(stats)
+    results = await generateResults(bot_, stats)
 
     await bot_.send(embed=results)
     
@@ -188,7 +188,7 @@ async def contingency(bot_, *args):
                 contingency_spend[i] -= 1
                 contingency_points -= 1    
 
-    results = await generateResults(stats)
+    results = await generateResults(bot_, stats)
     await bot_.send(embed=results)
     await bot_.send("To add racial bonuses, use command \"~race # # # # # #\"")
 
@@ -210,7 +210,7 @@ async def race(bot_, *args):
         for i in range(0,6):
             stats[i] += int(args[i])
 
-    results = await generateResults(stats)
+    results = await generateResults(bot_, stats)
     await bot_.send(embed=results)
 
     if hardcore:
@@ -236,7 +236,7 @@ async def standard(bot_, *args):
         rolls.remove(min(rolls))
         stats[stat] = sum(rolls)
 
-    results = await generateResults(stats)
+    results = await generateResults(bot_, stats)
     await bot_.send(embed=results)
 
 
