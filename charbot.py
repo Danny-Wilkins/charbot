@@ -10,10 +10,12 @@ import pickle
 from random import randint
 from random import choice
 from collections import OrderedDict
+import os
 
 bot = commands.Bot(command_prefix = "~")
 contingency_points = None
 hardcore = True
+TOKEN = os.getenv("DISCORD_TOKEN")
 
 @bot.event
 async def on_ready():
@@ -28,7 +30,7 @@ async def on_ready():
 #How to create a new command
 @bot.command(pass_context = True)
 async def ping(ctx):
-    await bot.say(":ping_pong: ping!!")
+    await bot       (":ping_pong: ping!!")
 '''
 
 @bot.command(pass_context = False)
@@ -37,7 +39,7 @@ async def hybrid(*args):
     global hardcore
 
     if len(args) != 7:
-        await bot.say("Invalid command! Usage: ~hybrid [hard|soft]core \_ \_ \_ \_ \_ \_ (each _ is a formula letter [a|b|c|d])")
+        await bot.send("Invalid command! Usage: ~hybrid [hard|soft]core \_ \_ \_ \_ \_ \_ (each _ is a formula letter [a|b|c|d])")
         return
 
     hardcore = args[0]
@@ -79,13 +81,13 @@ async def hybrid(*args):
 
     results = await generateResults(stats)
 
-    await bot.say(embed=results)
+    await bot.send(embed=results)
     
     
-    await bot.say("{} contingency points remaining.".format(contingency_points))
+    await bot.send("{} contingency points remaining.".format(contingency_points))
     
     if contingency_points != 0:
-        await bot.say("To spend contingency points, use command \"~contingency # # # # # #\"")
+        await bot.send("To spend contingency points, use command \"~contingency # # # # # #\"")
 
 async def roll(formula):
     global contingency_points
@@ -132,13 +134,13 @@ async def valid(contingency_points, formulas):
         elif formula.upper() == 'D':
             contingency_points -= 0
         else:
-            await bot.say("Invalid formula entry!")
+            await bot.send("Invalid formula entry!")
             return False
 
     if contingency_points >= 0:
         return True
     else:
-        await bot.say("Not enough contingency points!")
+        await bot.send("Not enough contingency points!")
         return False
 
 @bot.command(pass_context = False)
@@ -149,7 +151,7 @@ async def contingency(*args):
     contingency_spend = list(map(int, args))
 
     if sum(contingency_spend) > contingency_points:
-        await bot.say("Not enough contingency points!")
+        await bot.send("Not enough contingency points!")
         return
 
     if hardcore:
@@ -164,7 +166,7 @@ async def contingency(*args):
                 elif 15 <= stats[stat] < 18:
                     stats[stat] += 1
                 else:
-                    await bot.say("No effect. Choose another stat.")
+                    await bot.send("No effect. Choose another stat.")
                     contingency_points += 1
 
                 spend -= 1
@@ -180,15 +182,15 @@ async def contingency(*args):
                 elif 15 <= stats[i] < 18:
                     stats[i] += 1
                 else:
-                    await bot.say("No effect. Choose another stat.")
+                    await bot.send("No effect. Choose another stat.")
                     contingency_points += 1
 
                 contingency_spend[i] -= 1
                 contingency_points -= 1    
 
     results = await generateResults(stats)
-    await bot.say(embed=results)
-    await bot.say("To add racial bonuses, use command \"~race # # # # # #\"")
+    await bot.send(embed=results)
+    await bot.send("To add racial bonuses, use command \"~race # # # # # #\"")
 
     if hardcore:
         json.dump(stats, open("character.json", "w"), indent=4)
@@ -209,7 +211,7 @@ async def race(*args):
             stats[i] += int(args[i])
 
     results = await generateResults(stats)
-    await bot.say(embed=results)
+    await bot.send(embed=results)
 
     if hardcore:
         json.dump(stats, open("character.json", "w"), indent=4)
@@ -229,13 +231,13 @@ async def standard(*args):
         for i in range(0, 4):
             rolls.append(randint(1,6))
 
-        await bot.say(stat + ": " + str(rolls) + " drop " + str(min(rolls)))
+        await bot.send(stat + ": " + str(rolls) + " drop " + str(min(rolls)))
         
         rolls.remove(min(rolls))
         stats[stat] = sum(rolls)
 
     results = await generateResults(stats)
-    await bot.say(embed=results)
+    await bot.send(embed=results)
 
 
-bot.run("[TOKEN_HERE")
+bot.run(TOKEN)
